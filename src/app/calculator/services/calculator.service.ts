@@ -1,7 +1,7 @@
 import { Injectable, signal } from '@angular/core';
 
 const numbers = ['0','1','2','3','4','5','6','7','8','9'];
-const operators = ['+','-','*','/'];
+const operators = ['+','-','*','x','/','÷'];
 const specialOperators = ['+/-','%','.','=','C','Backspace'];
 
 @Injectable({
@@ -23,7 +23,7 @@ export class CalculatorService {
 
     // Calcular operacion (=)
     if(value === '=') {
-      console.log('Calcular resultado');
+      this.calculateResult();
       return;
     }
 
@@ -41,6 +41,12 @@ export class CalculatorService {
       //Si es valor es 0 no hacemos nada
       if(this.resultText() === '0') return;
 
+      //Si el valor es negativo lo convertimos en 0 al borrar
+      if(this.resultText().includes('-') && this.resultText().length === 2) {
+        this.resultText.set('0');
+        return;
+      }
+
       //Si tenemos un solo caracter lo convertimos en 0
       if(this.resultText().length === 1){
         this.resultText.set('0');
@@ -56,6 +62,9 @@ export class CalculatorService {
 
     //Operadores
     if(operators.includes(value)){
+
+      this.calculateResult();
+
       this.lastOperator.set(value);
       this.subResultText.set(this.resultText());
       this.resultText.set('0');
@@ -119,6 +128,46 @@ export class CalculatorService {
       return;
 
     }
+
+  }
+
+  public calculateResult() {
+
+    const number1 = parseFloat(this.subResultText());
+    const number2 = parseFloat(this.resultText());
+
+    let result = 0;
+
+    switch(this.lastOperator()) {
+
+      case '+':
+        result = number1 + number2;
+        break;
+
+      case '-':
+        result = number1 - number2;
+        break;
+
+      case '*':
+        result = number1 * number2;
+        break;
+
+      case 'x':
+        result = number1 * number2;
+        break;
+
+      case '/':
+        result = number1 / number2;
+        break;
+
+      case '÷':
+        result = number1 / number2;
+        break;
+
+    }
+
+    this.resultText.set(result.toString());
+    this.subResultText.set('0');
 
   }
 
